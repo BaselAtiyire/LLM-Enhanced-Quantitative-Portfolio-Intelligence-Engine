@@ -1,6 +1,14 @@
 [![Live App](https://img.shields.io/badge/Streamlit-Live%20App-red)](https://llm-enhanced-quantitative-portfolio-intelligence-engine-e385ca.streamlit.app/)
 ## 🌐 Live Demo
 https://llm-enhanced-quantitative-portfolio-intelligence-engine-e385ca.streamlit.app/
+## 🔐 Demo Login (Read-Only)
+
+To explore the live app:
+
+**Username:** admin 
+**Password:** admin123
+
+Note: Demo account has limited permissions (no admin/backtest controls).
 
 📊 LLM-Enhanced Quantitative Portfolio Intelligence Engine
 <p align="center"> <img src="assets/architecture.png" width="900"/> </p>
