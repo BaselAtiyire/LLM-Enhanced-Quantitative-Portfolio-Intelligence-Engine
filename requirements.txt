@@ -1,0 +1,3 @@
+agno
+python-dotenv
+yfinance
