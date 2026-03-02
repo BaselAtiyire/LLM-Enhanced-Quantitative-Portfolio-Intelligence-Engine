@@ -1,3 +1,7 @@
+[![Live App](https://img.shields.io/badge/Streamlit-Live%20App-red)](https://llm-enhanced-quantitative-portfolio-intelligence-engine-e385ca.streamlit.app/)
+## 🌐 Live Demo
+https://llm-enhanced-quantitative-portfolio-intelligence-engine-e385ca.streamlit.app/
+
 📊 LLM-Enhanced Quantitative Portfolio Intelligence Engine
 <p align="center"> <img src="assets/architecture.png" width="900"/> </p>
 
