@@ -242,12 +242,13 @@ python make_hash.py
 Replace hashes in config.yaml.
 
 Restart Streamlit.
+| Rank | Ticker | Score | 30D Ret | Ann Vol | Sharpe |
+| ---- | ------ | ----- | ------- | ------- | ------ |
+| 1    | AAPL   | 0.965 | 4.66%   | 29.63%  | 0.81   |
+| 2    | NVDA   | 0.652 | -0.50%  | 40.38%  | 0.42   |
+| 3    | AMD    | 0.315 | -7.82%  | 75.60%  | 0.11   |
 
-📊 Example Output
-Rank	Ticker	Score	30D Ret	Ann Vol	Sharpe
-1	AAPL	0.965	4.66%	29.63%	0.81
-2	NVDA	0.652	-0.50%	40.38%	0.42
-3	AMD	0.315	-7.82%	75.60%	0.11
+
 🎯 What This Project Demonstrates
 
 Production AI system design
