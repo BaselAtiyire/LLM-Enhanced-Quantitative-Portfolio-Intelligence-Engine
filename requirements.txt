@@ -1,3 +1,10 @@
-agno
+streamlit
+streamlit-authenticator
+PyYAML
 python-dotenv
+agno
 yfinance
+pandas
+numpy
+matplotlib
+bcrypt
