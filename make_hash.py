@@ -1,11 +1,8 @@
-import streamlit_authenticator as stauth
+import bcrypt
 
-# Create hasher
-hasher = stauth.Hasher()
+password = "Demo@2026!"   # ← change if you want
 
-# Hash ONE password at a time (your version requires single string)
-admin_hash = hasher.hash("admin123")
-basil_hash = hasher.hash("basil123")
+hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
-print("Admin hash:", admin_hash)
-print("Basil hash:", basil_hash)
+print("\nCopy this hash into config.yaml:\n")
+print(hashed)
