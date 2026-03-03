@@ -1,4 +1,3 @@
-
 ## 🌐 Live Demo
 https://llm-enhanced-quantitative-portfolio-intelligence-engine-e385ca.streamlit.app/
 
@@ -6,7 +5,7 @@ https://llm-enhanced-quantitative-portfolio-intelligence-engine-e385ca.streamlit
 **Username:** demo  
 **Password:** Demo@2026!
 
-*Demo account is read-only (no admin controls).*
+*Demo account is read-only (no admin controls)
 
 Note: Demo account has limited permissions (no admin/backtest controls).
 
