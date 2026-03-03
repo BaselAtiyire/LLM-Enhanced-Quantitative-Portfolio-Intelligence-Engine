@@ -1,8 +1,8 @@
-[![Live App](https://img.shields.io/badge/Streamlit-Live%20App-red)](https://llm-enhanced-quantitative-portfolio-intelligence-engine-e385ca.streamlit.app/)
-## 🔐 Demo Access (Recruiters)
 
-Live App: https://llm-enhanced-quantitative-portfolio-intelligence-engine-e385ca.streamlit.app/
+## 🌐 Live Demo
+https://llm-enhanced-quantitative-portfolio-intelligence-engine-e385ca.streamlit.app/
 
+## 🔐 Demo Login (Recruiters)
 **Username:** demo  
 **Password:** Demo@2026!
 
