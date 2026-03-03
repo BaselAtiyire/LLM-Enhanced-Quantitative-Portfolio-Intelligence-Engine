@@ -1,12 +1,12 @@
 [![Live App](https://img.shields.io/badge/Streamlit-Live%20App-red)](https://llm-enhanced-quantitative-portfolio-intelligence-engine-e385ca.streamlit.app/)
-## 🌐 Live Demo
-https://llm-enhanced-quantitative-portfolio-intelligence-engine-e385ca.streamlit.app/
-## 🔐 Demo Login (Read-Only)
+## 🔐 Demo Access (Recruiters)
 
-To explore the live app:
+Live App: https://llm-enhanced-quantitative-portfolio-intelligence-engine-e385ca.streamlit.app/
 
-**Username:** admin 
-**Password:** admin123
+**Username:** demo  
+**Password:** Demo@2026!
+
+*Demo account is read-only (no admin controls).*
 
 Note: Demo account has limited permissions (no admin/backtest controls).
 
