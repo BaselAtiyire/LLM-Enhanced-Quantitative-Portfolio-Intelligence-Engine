@@ -3,15 +3,16 @@ credentials:
     admin:
       email: admin@example.com
       name: Admin
-      password: "$2b$12$.GVUY2yu3RJDWyLyiUxEG.g9znTh4ovudf8p145S3Z5uY4G2meL4e"
+      password: "$2b$12$bNmDJg5hMNK668.eNA8OweWGjwkTgif5KAJr395mv36OPNNCOUc3G"
       role: admin
-    basil:
-      email: basil@example.com
-      name: Basil
-      password: "$2b$12$kz.a5AyiyLTv/Isok02IN.9bhMtERi6l2EFe3kesu1KWmQKY01Pb2"
+
+    demo:
+      email: demo@example.com
+      name: Demo User
+      password: "$2b$12$bNmDJg5hMNK668.eNA8OweWGjwkTgif5KAJr395mv36OPNNCOUc3G"
       role: user
 
 cookie:
-  name: "ai_finance_auth"
-  key: "CHANGE_THIS_TO_A_LONG_RANDOM_SECRET"
   expiry_days: 7
+  key: "super_secure_random_key_123"
+  name: "ai_finance_auth"
