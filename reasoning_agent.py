@@ -479,16 +479,19 @@ def backtest_walkforward(
             )
         }
 
-    # ── 2. Build monthly rebalance dates ──────────────────────────────────
-    # Use month-end dates directly from the returns index (pandas-version safe)
-    rebal_dates = (
-        rets.groupby([rets.index.year, rets.index.month])
-            .apply(lambda x: x.index[-1])
-            .values
-            .tolist()
-    )
-    rebal_dates = [pd.Timestamp(d) for d in rebal_dates]
-    rebal_set   = set(rebal_dates)
+    # ── 2. Build monthly rebalance dates (pandas 3.x + timezone safe) ──────
+    # Walk backwards through index, grab last trading day of each month
+    idx = rets.index
+    seen_ym  = set()
+    rebal_dates = []
+    for i in range(len(idx) - 1, -1, -1):
+        ts = pd.Timestamp(idx[i])
+        ym = (ts.year, ts.month)
+        if ym not in seen_ym:
+            seen_ym.add(ym)
+            rebal_dates.append(idx[i])
+    rebal_dates.sort()
+    rebal_set = set(rebal_dates)
 
     # ── 3. Walk-forward loop ──────────────────────────────────────────────
     np.random.seed(seed)
