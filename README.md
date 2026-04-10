@@ -1,300 +1,275 @@
+# 📊 LLM-Enhanced Quantitative Portfolio Intelligence Engine (HPIE)
+
+> **A production-grade AI system combining LLM reasoning, multi-factor equity ranking, QLoRA fine-tuning, walk-forward backtesting, and role-based authentication in a single open-source deployable platform.**
+
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://llm-enhanced-quantitative-portfolio-intelligence-engine-e385ca.streamlit.app/)
+
+---
+
 ## 🌐 Live Demo
-https://llm-enhanced-quantitative-portfolio-intelligence-engine-e385ca.streamlit.app/
 
-## 🔐 Demo Login (Recruiters)
-**Username:** demo  
-**Password:** Demo@2026!
+**URL:** https://llm-enhanced-quantitative-portfolio-intelligence-engine-e385ca.streamlit.app/
 
-*Demo account is read-only (no admin controls)
+### 🔐 Demo Login
+| Role | Username | Password |
+|---|---|---|
+| Demo (read-only) | `demo` | `Demo@2026!` |
 
-Note: Demo account has limited permissions (no admin/backtest controls).
+> Demo account has limited permissions. Backtest and Compare Runs panels require Admin access.
 
-📊 LLM-Enhanced Quantitative Portfolio Intelligence Engine
-<p align="center"> <img src="assets/architecture.png" width="900"/> </p>
+---
 
-A production-grade AI system combining LLM reasoning, systematic equity ranking, quantitative risk modeling, and walk-forward backtesting with secure authentication and persistent storage.
+## 👨‍💻 Authors
 
-🚀 Overview
+**Basel Atiyire** (1st Author) — School of Computer Science, Western Illinois University  
+**Ransom Igodi** (2nd Author) — School of Computer Science, Western Illinois University
 
-This project is an end-to-end AI-powered quantitative decision intelligence platform that integrates:
+---
 
-🧠 LLM reasoning (Agno framework)
+## 📄 Research Paper
 
-📈 Multi-factor equity ranking engine
+> B. Atiyire and R. Igodi, "A Hybrid LLM-Driven Portfolio Intelligence Engine for Explainable and Data-Driven Investment Decision Support," Draft Manuscript, April 2026.
 
-📊 Risk modeling (volatility, Sharpe ratio, drawdown)
+**Key results (live yfinance data, 8 April 2026, 20-stock S&P 500 universe, 5-year period):**
 
-🔄 Walk-forward backtesting
+| Metric | HPIE | Equal-Weight Benchmark | Delta |
+|---|---|---|---|
+| Sharpe Ratio | **1.109** | 0.883 | +0.226 |
+| Annualised Return | **24.49%** | 18.70% | +5.79 pp |
+| Annualised Volatility | 18.48% | 16.64% | +1.84 pp |
+| Maximum Drawdown | -22.96% | -18.44% | -4.52 pp |
 
-💾 Persistent storage (SQLite)
+**Top-5 Rankings (8 April 2026):**
 
-🔐 Role-based authentication (Admin / User)
+| Rank | Ticker | Score | 1W % | Sharpe | Ann Vol % |
+|---|---|---|---|---|---|
+| 1 | GOOGL | 0.697 | +11.34 | 0.681 | 30.43 |
+| 2 | AAPL | 0.638 | +1.89 | 0.497 | 21.28 |
+| 3 | NVDA | 0.626 | +6.32 | 1.160 | 37.78 |
+| 4 | MSFT | 0.597 | +4.35 | 0.306 | 23.01 |
+| 5 | AMZN | 0.589 | +7.24 | 0.211 | 29.08 |
 
-💬 Financial chatbot interface (grounded, no hallucinations)
+---
 
-It demonstrates LLM + Quantitative Finance + Production Engineering in a unified system.
+## 🚀 Overview
 
-🏗️ Architecture
+HPIE is an end-to-end AI-powered quantitative decision intelligence platform that integrates:
 
-The system follows a layered architecture:
+- 🧠 **LLM reasoning** — Agno framework (GPT-4 / Groq LLaMA), quantitatively grounded
+- 🤖 **QLoRA fine-tuning** — Mistral 7B fine-tuned on HPIE-generated instruction pairs
+- 📈 **Multi-factor equity ranking** — 5 configurable factor-weight sliders
+- 📊 **Risk modelling** — volatility, Sharpe ratio, drawdown, rolling volatility
+- 🔄 **Walk-forward backtesting** — Sharpe-optimised, monthly rebalancing, benchmark comparison
+- 💾 **Persistent storage** — SQLite run history with comparison engine
+- 🔐 **Role-based authentication** — bcrypt (cost 12), Admin / User RBAC
+- 💬 **Financial chatbot** — grounded, zero hallucination by design
 
-1️⃣ Interface Layer
+---
 
-Streamlit application
+## 🏗️ Architecture
 
-Financial chatbot UI
+The system follows a six-layer architecture:
 
-Ranking dashboard
+| Layer | Panel / Module | Technology | Access |
+|---|---|---|---|
+| L1 | Controls — tickers, period, risk-free rate | yfinance, Streamlit | All users |
+| L2 | Ranking weights — 5 sliders | NumPy / Pandas z-score engine | All users |
+| L3 | AI Chatbot (Agno) — grounded | Agno + GPT-4 / Groq + QLoRA Mistral 7B | Sign-in required |
+| L4 | Chat & Analysis — factor attribution | Additive score decomposition | All users |
+| L5 | Compare Runs — SQLite history diff | SQLite snapshot engine | Admin only |
+| L5 | Backtest — equity curve vs benchmark | Sharpe-optimised walk-forward | Admin only |
+| L6 | Streamlit dashboard | Streamlit + Matplotlib | Role-gated |
 
-Backtesting visualization
+---
 
-2️⃣ Authentication Layer
+## 🤖 QLoRA Fine-Tuning (C6)
 
-bcrypt password hashing
+The LLM reasoning agent has been fine-tuned using QLoRA on HPIE-generated instruction-following pairs:
 
-YAML credential storage
+- **Base model:** Mistral 7B Instruct v0.3
+- **Method:** QLoRA — 4-bit NF4 quantisation + LoRA adapters (r=16, α=32)
+- **Target modules:** q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj
+- **Training:** 5 epochs, lr=2e-4, cosine schedule, Tesla T4 16GB GPU
+- **Data:** Auto-generated from HPIE CSV exports via `generate_training_data.py`
+- **Result:** Zero hallucinated values across all evaluated inference tests
 
-Role-based access control
+### QLoRA Pipeline Files
 
-Session management
+| File | Purpose |
+|---|---|
+| `generate_training_data.py` | Converts HPIE CSV exports to Alpaca-format JSONL training pairs |
+| `qlora_finetune.py` | Full QLoRA fine-tuning script (local GPU) |
+| `HPIE_QLoRA_Colab.ipynb` | Google Colab notebook — runs on free T4 GPU |
+| `integrate_qlora.py` | Loads fine-tuned adapter into HPIE app |
 
-3️⃣ Quant Analytics Engine
+---
 
-Market data ingestion (yfinance)
+## 📈 Multi-Factor Ranking Engine
 
-Feature engineering
+The scoring engine supports configurable weights:
 
-Cross-sectional normalization
-
-Multi-factor scoring
-
-4️⃣ LLM Reasoning Layer (Agno)
-
-Data-grounded reasoning
-
-Evidence-based explanations
-
-Strictly structured outputs
-
-No synthetic financial data generation
-
-5️⃣ Backtesting Engine
-
-Rolling window optimization
-
-Monthly rebalancing
-
-Sharpe-optimized portfolio
-
-Benchmark comparison
-
-6️⃣ Storage Layer
-
-SQLite database
-
-Run history tracking
-
-Snapshot persistence
-
-Run comparison engine
-
-📈 Quantitative Metrics Implemented
-
-The engine computes:
-
-1-Week Return
-
-30-Day Return
-
-Annualized Volatility (σ × √252)
-
-Rolling 20-Day Volatility
-
-Sharpe Ratio
-
-Maximum Drawdown
-
-Market Capitalization
-
-Trailing P/E
-
-Composite Multi-Factor Score
-
-🏆 Multi-Factor Ranking Engine
-
-The scoring engine supports customizable weights:
-
+```python
 weights = {
-    "market_cap": 0.3,
-    "one_week_pct": 0.25,
-    "ret_30d": 0.15,
-    "trailing_pe": 0.15,
-    "vol_ann": 0.15
+    "market_cap":   0.30,   # higher is better
+    "one_week_pct": 0.25,   # higher is better
+    "ret_30d":      0.15,   # higher is better
+    "trailing_pe":  0.15,   # lower is better (sign-inverted)
+    "vol_ann":      0.15,   # lower is better (sign-inverted)
 }
+```
 
-Cross-sectional normalization ensures comparable scaling across features.
+Composite score: `S_i = Σ w_k · z_{i,k}` where `z_{i,k} = (x_{i,k} - μ_k) / σ_k`
 
-🔄 Walk-Forward Backtesting
+---
 
-The system simulates realistic portfolio construction:
+## 🔄 Walk-Forward Backtesting
 
-Rolling lookback window
+- Rolling 252-day lookback window
+- Monthly rebalancing
+- Sharpe-optimised allocation (7,000 Dirichlet samples per rebalance)
+- Equal-weight benchmark comparison
+- Equity curve visualisation
+- 5 bps one-way transaction costs
 
-Monthly rebalance
+---
 
-Sharpe-optimized allocation
+## 🔐 Authentication & Roles
 
-Equal-weight benchmark comparison
+| Feature | Unauthenticated | User | Admin |
+|---|---|---|---|
+| Controls & weights | ❌ | ✅ | ✅ |
+| Run — generate dataset | ❌ | ✅ | ✅ |
+| AI Chatbot | ❌ | ✅ | ✅ |
+| Backtest panel | ❌ | Hidden | ✅ |
+| Compare Runs panel | ❌ | Hidden | ✅ |
 
-Equity curve visualization
+Passwords hashed with bcrypt (cost factor 12).
 
-Risk-adjusted performance comparison
+---
 
-🤖 LLM-Powered Financial Chatbot
+## ⚙️ Tech Stack
 
-Built with Agno, the chatbot:
+| Category | Technologies |
+|---|---|
+| Frontend | Streamlit |
+| LLM Framework | Agno (GPT-4 / Groq LLaMA) |
+| Fine-tuning | QLoRA — PEFT, bitsandbytes, TRL, Mistral 7B |
+| Data | yfinance (Yahoo Finance) |
+| Quant | NumPy, Pandas |
+| Storage | SQLite |
+| Auth | bcrypt, YAML |
+| Visualisation | Matplotlib |
+| Language | Python 3.10+ |
 
-Answers questions about ranking results
+---
 
-Explains risk metrics
+## 📂 Project Structure
 
-Provides evidence-based insights
-
-Operates only on computed dataset
-
-Prevents hallucinated financial values
-
-Example query:
-
-“Why is AAPL ranked #1?”
-
-The model explains based on:
-
-Sharpe
-
-Volatility
-
-30D return
-
-Market cap strength
-
-Valuation metrics
-
-🔐 Authentication & Roles
-
-Supports:
-
-Admin
-
-Run comparisons
-
-Backtesting controls
-
-Database management
-
-User
-
-Ranking analysis
-
-Chatbot queries
-
-Dashboard viewing
-
-Passwords are securely hashed using bcrypt.
-
-⚙️ Tech Stack
-
-Python
-
-Streamlit
-
-Agno (LLM framework)
-
-yfinance
-
-NumPy / Pandas
-
-SQLite
-
-bcrypt
-
-YAML
-
-Matplotlib
-
-📂 Project Structure
+```
 LLM-Enhanced-Quantitative-Portfolio-Intelligence-Engine/
 │
-├── app_chatbot.py
-├── reasoning_agent.py
-├── make_hash.py
-├── config.yaml
+├── app_chatbot.py               # Main Streamlit application
+├── reasoning_agent.py           # Quant engine + backtest + DB
+├── generate_training_data.py    # QLoRA training data generator
+├── qlora_finetune.py            # QLoRA fine-tuning script
+├── integrate_qlora.py           # Load adapter into app
+├── HPIE_QLoRA_Colab.ipynb      # Colab fine-tuning notebook
+├── make_hash.py                 # bcrypt password hash generator
+├── config.yaml                  # User credentials
 ├── requirements.txt
 ├── README.md
 └── assets/
     └── architecture.png
-▶️ Installation & Setup
-1️⃣ Clone Repository
+```
+
+---
+
+## ▶️ Installation & Setup
+
+### 1. Clone Repository
+```bash
 git clone https://github.com/BaselAtiyire/LLM-Enhanced-Quantitative-Portfolio-Intelligence-Engine.git
 cd LLM-Enhanced-Quantitative-Portfolio-Intelligence-Engine
-2️⃣ Create Virtual Environment
+```
+
+### 2. Create Virtual Environment
+```bash
 python -m venv venv
 venv\Scripts\activate   # Windows
-3️⃣ Install Dependencies
+source venv/bin/activate  # Mac/Linux
+```
+
+### 3. Install Dependencies
+```bash
 pip install -r requirements.txt
-4️⃣ Run Application
-streamlit run app_chatbot.py
-🔐 Authentication Setup
+```
 
-Generate password hashes:
-
+### 4. Configure Authentication
+```bash
 python make_hash.py
+# Copy hashes into config.yaml
+```
 
-Replace hashes in config.yaml.
+### 5. Run Application
+```bash
+streamlit run app_chatbot.py
+```
 
-Restart Streamlit.
-| Rank | Ticker | Score | 30D Ret | Ann Vol | Sharpe |
-| ---- | ------ | ----- | ------- | ------- | ------ |
-| 1    | AAPL   | 0.965 | 4.66%   | 29.63%  | 0.81   |
-| 2    | NVDA   | 0.652 | -0.50%  | 40.38%  | 0.42   |
-| 3    | AMD    | 0.315 | -7.82%  | 75.60%  | 0.11   |
+---
 
+## 🤖 QLoRA Fine-Tuning Setup
 
-🎯 What This Project Demonstrates
+### Step 1 — Export training data from your app
+```bash
+# Export CSV files from the app, then run:
+python generate_training_data.py
+# Produces: hpie_train.jsonl, hpie_eval.jsonl
+```
 
-Production AI system design
+### Step 2 — Fine-tune on Google Colab
+- Upload `HPIE_QLoRA_Colab.ipynb` to Colab
+- Set runtime to T4 GPU
+- Upload the JSONL files when prompted
+- Run all cells (~45 minutes)
+- Download `hpie-llama-qlora.zip`
 
-LLM integration into structured pipelines
+### Step 3 — Integrate into app
+```bash
+# Unzip adapter into project folder
+# Set USE_QLORA=true in .env
+python integrate_qlora.py  # test
+```
 
-Quantitative modeling rigor
+---
 
-Risk-aware portfolio construction
+## 🎯 Research Contributions
 
-Persistent data architecture
+| # | Contribution |
+|---|---|
+| C1 | Six-layer architecture mapping directly to live UI panels |
+| C2 | Quantitative grounding as a structural anti-hallucination mechanism |
+| C3 | Configurable five-factor ranking with real-time weight adjustment |
+| C4 | bcrypt role-based access control with admin-gated backtesting |
+| C5 | Fully reproducible results from live yfinance data |
+| C6 | QLoRA fine-tuning of Mistral 7B on HPIE-generated instruction pairs |
 
-Role-based security implementation
+---
 
-Clean modular separation of concerns
+## 🚀 Future Work
 
+- Convex optimisation (CVXPY) portfolio allocation
+- Real-time news ingestion via RAG
+- Online Bayesian weight updating from realised performance
+- Docker containerisation
+- MiFID II compliance certification pathway
+- Multi-asset extension to fixed income and commodities
+- Controlled user study measuring decision quality with/without HPIE
 
-🚀 Future Improvements
+---
 
-Convex optimization (CVXPY) portfolio allocation
+## 📌 Authors
 
-Factor exposure decomposition
+**Basel Atiyire** — School of Computer Science, Western Illinois University  
+**Ransom Igodi** — School of Computer Science, Western Illinois University
 
-Monte Carlo simulation
-
-Docker containerization
-
-Cloud deployment (AWS/GCP)
-
-Real-time streaming feeds
-
-Vector-based financial memory store
-
-📌 Author
-
-Basel Atiyire
-AI Engineer | Quantitative Systems Builder | LLM Applications
-Building AI-powered financial intelligence systems.
+> *Building AI-powered financial intelligence systems.*
