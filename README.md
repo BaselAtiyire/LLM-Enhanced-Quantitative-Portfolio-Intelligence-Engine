@@ -13,7 +13,7 @@
 ### 🔐 Demo Login
 | Role | Username | Password |
 |---|---|---|
-| Demo (read-only) | `demo` | `Demo@2026!` |
+| Demo (read-only) | `demo/admin` | `Demo@2026!` |
 
 > Demo account has limited permissions. Backtest and Compare Runs panels require Admin access.
 
