@@ -1,0 +1,10 @@
+﻿*.bin
+*.pt
+*.safetensors
+*.pkl
+*.pyc
+__pycache__/
+.env
+hpie-llama-qlora/
+*.zip
+*.csv
