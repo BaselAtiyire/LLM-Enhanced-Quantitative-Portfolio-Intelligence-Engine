@@ -1,4 +1,4 @@
-﻿# reasoning_agent.py
+# reasoning_agent.py
 from dotenv import load_dotenv
 import os
 from datetime import datetime
@@ -98,7 +98,14 @@ def fmt_range(low, high):
 # =============================
 # Price history + quant metrics
 # =============================
-def _yf_session():`n    import requests`n    s = requests.Session()`n    s.headers.update({"User-Agent": "Mozilla/5.0"})`n    return s`n`ndef get_close_history(symbol: str, period: str = "1y", end_date: str = None) -> pd.Series:`n    t    = yf.Ticker(symbol, session=_yf_session())
+def _yf_session():
+    import requests
+    s = requests.Session()
+    s.headers.update({"User-Agent": "Mozilla/5.0"})
+    return s
+
+def get_close_history(symbol: str, period: str = "1y", end_date: str = None) -> pd.Series:
+    t    = yf.Ticker(symbol, session=_yf_session())
     hist = t.history(period=period, end=end_date)
     if hist is None or hist.empty or "Close" not in hist.columns:
         return pd.Series(dtype=float)
@@ -177,7 +184,8 @@ def compute_quant_pack(symbol: str, period: str = "1y", rf_annual: float = 0.0, 
 # =============================
 # Snapshot (fundamentals + quant pack)
 # =============================
-def get_stock_snapshot(symbol: str, period: str = "1y", rf_annual: float = 0.0, end_date: str = None) -> dict:`n    t = yf.Ticker(symbol, session=_yf_session())
+def get_stock_snapshot(symbol: str, period: str = "1y", rf_annual: float = 0.0, end_date: str = None) -> dict:
+    t = yf.Ticker(symbol, session=_yf_session())
     try:
         info = t.info or {}
     except Exception:
@@ -368,7 +376,7 @@ def db_init(conn: sqlite3.Connection):
 
 
 def db_migrate(conn: sqlite3.Connection):
-    """Safe migration â€” adds new columns if they don't exist."""
+    """Safe migration â€ adds new columns if they don't exist."""
     cur = conn.cursor()
     cur.execute("PRAGMA table_info(snapshots);")
     existing = {row[1] for row in cur.fetchall()}
@@ -431,7 +439,7 @@ def db_insert_snapshots(conn: sqlite3.Connection, run_id: int, rows: List[dict])
 
 
 # =============================
-# Backtest â€” walk-forward monthly rebalance
+# Backtest â€ walk-forward monthly rebalance
 # =============================
 def backtest_walkforward(
     tickers: List[str],
@@ -461,7 +469,7 @@ def backtest_walkforward(
     n_samples_opt  : number of random portfolios sampled per rebalance
     seed           : random seed for reproducibility
     """
-    # â”€â”€ 1. Download prices â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # â€â€ 1. Download prices â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€
     closes = []
     valid  = []
     for t in tickers:
@@ -485,7 +493,7 @@ def backtest_walkforward(
             )
         }
 
-    # â”€â”€ 2. Build monthly rebalance dates (pandas 3.x + timezone safe) â”€â”€â”€â”€â”€â”€
+    # â€â€ 2. Build monthly rebalance dates (pandas 3.x + timezone safe) â€â€â€â€â€â€
     # Walk backwards through index, grab last trading day of each month
     idx = rets.index
     seen_ym  = set()
@@ -499,7 +507,7 @@ def backtest_walkforward(
     rebal_dates.sort()
     rebal_set = set(rebal_dates)
 
-    # â”€â”€ 3. Walk-forward loop â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # â€â€ 3. Walk-forward loop â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€
     np.random.seed(seed)
 
     eq_opt  = [1.0]
@@ -547,7 +555,7 @@ def backtest_walkforward(
     eq_opt_s = pd.Series(eq_opt[1:], index=dates[1:], name="HPIE")
     eq_eqw_s = pd.Series(eq_eqw[1:], index=dates[1:], name="Equal-Weight")
 
-    # â”€â”€ 4. Compute summary stats â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # â€â€ 4. Compute summary stats â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€â€
     def summarize(equity: pd.Series) -> dict:
         daily   = equity.pct_change().dropna()
         ar      = float(daily.mean() * 252)
