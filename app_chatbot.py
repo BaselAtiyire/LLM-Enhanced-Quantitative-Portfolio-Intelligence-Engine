@@ -231,23 +231,6 @@ with tab1:
         "Risk-free rate (annual, decimal)", 0.0, 0.20, 0.00, 0.01
     )
 
-    # ── DATE PICKER (reproducibility) ────────────────────────────────────────
-    import datetime as _dt
-    st.sidebar.subheader("📅 Data as of date")
-    selected_date = st.sidebar.date_input(
-        label="Fetch market data as of",
-        value=_dt.date(2026, 5, 8),
-        min_value=_dt.date(2020, 1, 1),
-        max_value=_dt.date.today(),
-        help="Set to 2026-05-08 to reproduce the exact results reported in the paper.",
-    )
-    selected_date_str = selected_date.strftime("%Y-%m-%d")
-    st.sidebar.caption(
-        f"📌 Data as of: **{selected_date_str}**  \n"
-        "Set to **2026-05-08** to reproduce paper results."
-    )
-    # ─────────────────────────────────────────────────────────────────────────
-
     st.sidebar.subheader("Ranking weights")
     w_mcap = st.sidebar.number_input("Market Cap",               value=0.30, step=0.05)
     w_mom  = st.sidebar.number_input("1W %",                     value=0.25, step=0.05)
@@ -270,10 +253,10 @@ with tab1:
             st.sidebar.error("Enter at least 2 tickers.")
         else:
             with st.spinner("Fetching data + computing metrics..."):
-                raw_rows    = [get_stock_snapshot(t, period=period, rf_annual=rf, end_date=selected_date_str) for t in tickers]
+                raw_rows    = [get_stock_snapshot(t, period=period, rf_annual=rf) for t in tickers]
                 scored_rows = add_scores_and_ranks(raw_rows, weights=weights)
 
-            as_of  = f"{selected_date_str} {datetime.now().strftime('%H:%M:%S')}"
+            as_of  = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             source = "yfinance (Yahoo Finance)"
 
             # ── Save to SQLite ──────────────────────────────────────────────
@@ -336,7 +319,7 @@ with tab1:
             st.markdown("### 📊 Score chart")
             try:
                 import plotly.graph_objects as go
-                # Use raw numeric data to avoid string-sort issues
+                # Use raw table data (numeric) not the formatted display df
                 raw = pd.DataFrame(ds["table"]).copy()
                 raw["score"] = pd.to_numeric(raw["score"], errors="coerce")
                 raw["rank"]  = pd.to_numeric(raw["rank"],  errors="coerce")
@@ -350,11 +333,11 @@ with tab1:
                 ))
                 fig.update_layout(
                     xaxis_title="Ticker", yaxis_title="Score",
-                    height=400, margin=dict(t=40, b=40),
+                    height=380, margin=dict(t=30, b=40),
                     yaxis=dict(range=[0, raw["score"].max() * 1.18])
                 )
                 st.plotly_chart(fig, use_container_width=True)
-            except Exception as e:
+            except Exception:
                 st.bar_chart(
                     df.sort_values("Rank")[["Ticker","Score"]].set_index("Ticker"),
                     use_container_width=True
@@ -374,38 +357,21 @@ with tab1:
             st.warning("Run a dataset first (▶ Run in the sidebar).")
         else:
             st.session_state.chat_by_dataset[dkey].append({"role":"user","content":q})
-            # Compact dataset — one line per ticker to save tokens
-            def _fmt(v, pct=False):
-                try:
-                    f = float(v)
-                    return f"{f*100:.2f}%" if pct else f"{f:.3f}"
-                except Exception:
-                    return str(v) if v not in (None, "") else "n/a"
+            prompt = f"""
+You are a concise finance assistant. Answer the user's question using ONLY the dataset below.
 
-            rows = []
-            for r in ds["table"]:
-                rows.append(
-                    f"{r.get('rank','?')}. {r.get('ticker','?')} | "
-                    f"Score={_fmt(r.get('score'))} | "
-                    f"Price=${float(r.get('price',0)):,.2f} | "
-                    f"1W={_fmt(r.get('one_week_pct'),True)} | "
-                    f"30D={_fmt(r.get('ret_30d'),True)} | "
-                    f"AnnVol={_fmt(r.get('vol_ann'),True)} | "
-                    f"Sharpe={_fmt(r.get('sharpe'))} | "
-                    f"MaxDD={_fmt(r.get('max_drawdown'),True)} | "
-                    f"P/E={_fmt(r.get('trailing_pe'))} | "
-                    f"MktCap={r.get('market_cap','n/a')}"
-                )
-            compact = "\n".join(rows)
+Rules:
+- Answer in plain English only. Never respond with JSON or code blocks.
+- Be direct and concise — 2-5 sentences maximum.
+- Never repeat the answer twice or say "The final answer is".
+- If a metric is missing from the dataset, say so.
+- Format numbers cleanly (e.g. 13.78% not 0.1378, $287.44 not 287.44).
 
-            prompt = f"""You are a concise finance assistant. Answer using ONLY the data below.
-Rules: plain English only, 2-4 sentences max, no JSON, no code formatting, no backticks, no repetition.
-Format numbers cleanly: percentages as X.XX%, prices as $X.XX, market caps as $X.XXB or $X.XXT.
+Dataset:
+{json.dumps(ds["table"], indent=2, default=str)}
 
-Tickers ranked by score:
-{compact}
-
-Question: {q}""".strip()
+Question: {q}
+""".strip()
             with st.chat_message("assistant"):
                 resp = agent.run(prompt)
                 import re
@@ -414,6 +380,7 @@ Question: {q}""".strip()
                 else:
                     text = str(resp)
                 text = re.sub(r"```[a-z]*\n.*?```", "", text, flags=re.DOTALL).strip()
+                text = re.sub(r"`([^`]+)`", r"\1", text)  # strip inline backticks
                 lines = text.split("\n")
                 seen = set()
                 clean = []
