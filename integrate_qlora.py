@@ -1,4 +1,4 @@
-# integrate_qlora.py
+﻿# integrate_qlora.py
 # Loads the fine-tuned QLoRA adapter into HPIE as the reasoning agent
 # Drop this file into your project folder alongside app_chatbot.py
 #
@@ -9,13 +9,13 @@ import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 from peft import PeftModel
 
-# ── Configuration ─────────────────────────────────────────────────────────────
-BASE_MODEL  = "mistralai/Mistral-7B-Instruct-v0.3"
+# â”€â”€ Configuration â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+BASE_MODEL  = "meta-llama/Meta-Llama-3.1-8B-Instruct"
 ADAPTER_DIR = "./hpie-llama-qlora"   # output from qlora_finetune.py
 MAX_NEW_TOKENS = 512
 TEMPERATURE    = 0.1    # low temperature for factual, grounded responses
 
-# ── Load model with QLoRA adapter ────────────────────────────────────────────
+# â”€â”€ Load model with QLoRA adapter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def load_qlora_model():
     print("Loading QLoRA fine-tuned HPIE model...")
 
@@ -43,7 +43,7 @@ def load_qlora_model():
     return model, tokenizer
 
 
-# ── Inference function ────────────────────────────────────────────────────────
+# â”€â”€ Inference function â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def qlora_chat(model, tokenizer, context_str: str, question: str) -> str:
     """
     Runs inference with the fine-tuned HPIE model.
@@ -88,7 +88,7 @@ def qlora_chat(model, tokenizer, context_str: str, question: str) -> str:
     return response.strip()
 
 
-# ── Test locally ──────────────────────────────────────────────────────────────
+# â”€â”€ Test locally â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 if __name__ == "__main__":
     model, tokenizer = load_qlora_model()
 
@@ -107,7 +107,7 @@ Rank  Ticker  Score    1W%      30D%     AnnVol%    Sharpe   MaxDD%    P/E      
     ]
 
     print("\n" + "="*60)
-    print("HPIE QLoRA Model — Test Inference")
+    print("HPIE QLoRA Model â€” Test Inference")
     print("="*60)
 
     for q in questions:
