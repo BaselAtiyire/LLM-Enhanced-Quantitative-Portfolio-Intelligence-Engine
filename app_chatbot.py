@@ -349,7 +349,7 @@ with tab1:
                 fig.update_layout(
                     xaxis_title="Ticker", yaxis_title="Score",
                     height=380, margin=dict(t=30, b=40),
-                    yaxis=dict(range=[0, raw["score"].max() * 1.18])
+                    yaxis=dict(range=[0.2, raw["score"].max() * 1.15], autorange=False)
                 )
                 st.plotly_chart(fig, use_container_width=True)
             except Exception:
