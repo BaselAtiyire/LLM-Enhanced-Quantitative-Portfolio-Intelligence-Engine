@@ -1,4 +1,4 @@
-﻿import os
+import os
 import json
 from datetime import datetime
 
@@ -29,7 +29,7 @@ from reasoning_agent import (
 # Page config FIRST
 # =========================
 st.set_page_config(page_title="AI Financial Chatbot (Agno)", layout="wide")
-st.title("ðŸ“Š AI Financial Chatbot (Agno)")
+st.title("📊 AI Financial Chatbot (Agno)")
 st.caption("Sign in to continue.")
 
 load_dotenv()
@@ -71,7 +71,7 @@ def do_logout():
 # Login UI
 # =========================
 if not st.session_state.auth_ok:
-    st.subheader("ðŸ” Login")
+    st.subheader("🔐 Login")
     with st.form("login_form", clear_on_submit=False):
         u = st.text_input("Username", placeholder="e.g., admin or basil")
         p = st.text_input("Password", type="password", placeholder="your password")
@@ -91,7 +91,7 @@ if not st.session_state.auth_ok:
         st.session_state.auth_user = u
         st.session_state.auth_name = user.get("name", u)
         st.session_state.auth_role = user.get("role", "user")
-        st.success("Logged in âœ…")
+        st.success("Logged in ✅")
         st.rerun()
 
     st.info("Enter your username and password above, then click Login.")
@@ -119,7 +119,7 @@ elif os.getenv("OPENAI_API_KEY"):
     model = OpenAIResponses(id="gpt-4o")
 else:
     st.error(
-        "âš ï¸ No LLM API key found. Please add GROQ_API_KEY to your .env file "
+        "⚠️ No LLM API key found. Please add GROQ_API_KEY to your .env file "
         "and restart the app. Get a free key at https://console.groq.com"
     )
     st.stop()
@@ -211,13 +211,13 @@ if "bt_result"       not in st.session_state: st.session_state.bt_result       =
 # =========================
 # Tabs
 # =========================
-tab1, tab2, tab3 = st.tabs(["ðŸ§  Chat & Analysis", "ðŸ†š Compare Runs (Admin)", "ðŸ“ˆ Backtest (Admin)"])
+tab1, tab2, tab3 = st.tabs(["🧠 Chat & Analysis", "🆚 Compare Runs (Admin)", "📈 Backtest (Admin)"])
 
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-# TAB 1 â€” Chat & Analysis
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ──────────────────────────────────────────────────────────────────────────────
+# TAB 1 — Chat & Analysis
+# ──────────────────────────────────────────────────────────────────────────────
 with tab1:
-    st.sidebar.header("âš™ï¸ Controls")
+    st.sidebar.header("⚙️ Controls")
 
     tickers_text = st.sidebar.text_input(
         "Tickers (comma-separated)", "NVDA, AMD, TSLA, AAPL"
@@ -229,21 +229,6 @@ with tab1:
     )
     rf = st.sidebar.number_input(
         "Risk-free rate (annual, decimal)", 0.0, 0.20, 0.00, 0.01
-    )
-
-    # DATE PICKER
-    import datetime as _dt
-    st.sidebar.subheader("📅 Data as of date")
-    selected_date = st.sidebar.date_input(
-        label="Fetch market data as of",
-        value=_dt.date(2026, 5, 8),
-        min_value=_dt.date(2020, 1, 1),
-        max_value=_dt.date.today(),
-        help="Set to 2026-05-08 to reproduce paper results exactly.",
-    )
-    selected_date_str = selected_date.strftime("%Y-%m-%d")
-    st.sidebar.caption(
-        f"📌 Data as of: **{selected_date_str}**\nSet to **2026-05-08** to reproduce paper results."
     )
 
     st.sidebar.subheader("Ranking weights")
@@ -261,7 +246,7 @@ with tab1:
         "vol_ann":      float(w_vol),
     }
 
-    run_btn = st.sidebar.button("â–¶ Run")
+    run_btn = st.sidebar.button("▶ Run")
 
     if run_btn:
         if len(tickers) < 2:
@@ -274,7 +259,7 @@ with tab1:
             as_of  = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             source = "yfinance (Yahoo Finance)"
 
-            # â”€â”€ Save to SQLite â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+            # ── Save to SQLite ──────────────────────────────────────────────
             conn = db_connect()
             db_init(conn)
             db_migrate(conn)
@@ -284,7 +269,7 @@ with tab1:
             )
             db_insert_snapshots(conn, run_id=run_id, rows=scored_rows)
             conn.close()
-            # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+            # ───────────────────────────────────────────────────────────────
 
             st.session_state.dataset = {
                 "run_id":  run_id,
@@ -297,18 +282,18 @@ with tab1:
                 "rf":      rf,
             }
             st.session_state.chat_by_dataset = {}
-            st.sidebar.success(f"Analysis ready âœ…  (run_id={run_id})")
+            st.sidebar.success(f"Analysis ready ✅  (run_id={run_id})")
 
     ds   = st.session_state.dataset
     dkey = dataset_key(ds)
     st.session_state.chat_by_dataset.setdefault(dkey, [])
 
-    # â”€â”€ Dataset (full width) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    st.subheader("ðŸ“Œ Dataset")
+    # ── Dataset (full width) ──────────────────────────────────────────────────
+    st.subheader("📌 Dataset")
     if not ds:
-        st.info("Click â–¶ Run to generate a dataset.")
+        st.info("Click ▶ Run to generate a dataset.")
     else:
-        st.write(f"**As of:** {ds['as_of']}  |  **Run ID:** {ds.get('run_id','â€”')}")
+        st.write(f"**As of:** {ds['as_of']}  |  **Run ID:** {ds.get('run_id','—')}")
         st.write(f"**Tickers:** {', '.join(ds['tickers'])}")
         st.write(f"**Weights:** {ds['weights']}")
 
@@ -319,19 +304,19 @@ with tab1:
 
         col_csv, col_exp = st.columns([1, 3])
         with col_csv:
-            if st.button("â¬‡ï¸ Export CSV"):
+            if st.button("⬇️ Export CSV"):
                 fname = export_to_csv(ds["table"], as_of=ds["as_of"])
                 with open(fname, "rb") as f_:
                     st.download_button(
                         "Download CSV", data=f_, file_name=fname, mime="text/csv"
                     )
         with col_exp:
-            with st.expander("ðŸ“˜ Glossary"):
+            with st.expander("📘 Glossary"):
                 for k, v in GLOSSARY.items():
-                    st.markdown(f"**{k}** â€” {v}")
+                    st.markdown(f"**{k}** — {v}")
 
         if not df.empty and "Score" in df.columns:
-            st.markdown("### ðŸ“Š Score chart")
+            st.markdown("### 📊 Score chart")
             try:
                 import plotly.graph_objects as go
                 # Use raw table data (numeric) not the formatted display df
@@ -360,16 +345,16 @@ with tab1:
 
     st.divider()
 
-    # â”€â”€ Chat (full width below dataset) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    st.subheader("ðŸ’¬ Chat (uses ONLY dataset facts)")
+    # ── Chat (full width below dataset) ───────────────────────────────────────
+    st.subheader("💬 Chat (uses ONLY dataset facts)")
     for m in st.session_state.chat_by_dataset[dkey]:
         with st.chat_message(m["role"]):
             st.markdown(m["content"])
 
-    q = st.chat_input("Ask about ranks, volatility, Sharpe, drawdown, valuationâ€¦")
+    q = st.chat_input("Ask about ranks, volatility, Sharpe, drawdown, valuation…")
     if q:
         if not ds:
-            st.warning("Run a dataset first (â–¶ Run in the sidebar).")
+            st.warning("Run a dataset first (▶ Run in the sidebar).")
         else:
             st.session_state.chat_by_dataset[dkey].append({"role":"user","content":q})
             prompt = f"""
@@ -377,7 +362,7 @@ You are a concise finance assistant. Answer the user's question using ONLY the d
 
 Rules:
 - Answer in plain English only. Never respond with JSON or code blocks.
-- Be direct and concise â€” 2-5 sentences maximum.
+- Be direct and concise — 2-5 sentences maximum.
 - Never repeat the answer twice or say "The final answer is".
 - If a metric is missing from the dataset, say so.
 - Format numbers cleanly (e.g. 13.78% not 0.1378, $287.44 not 287.44).
@@ -410,14 +395,14 @@ Question: {q}
                 {"role":"assistant","content":text}
             )
 
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-# TAB 2 â€” Compare Runs (Admin)
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ──────────────────────────────────────────────────────────────────────────────
+# TAB 2 — Compare Runs (Admin)
+# ──────────────────────────────────────────────────────────────────────────────
 with tab2:
     if user_role != "admin":
-        st.info("ðŸ”’ Admin only.")
+        st.info("🔒 Admin only.")
     else:
-        st.header("ðŸ†š Compare Runs")
+        st.header("🆚 Compare Runs")
         st.caption("Select any two saved runs to compare rank movement and score changes.")
 
         conn = db_connect()
@@ -431,10 +416,10 @@ with tab2:
         )
 
         if runs_df.empty:
-            st.info("No saved runs yet. Use â–¶ Run in the Controls panel to create runs.")
+            st.info("No saved runs yet. Use ▶ Run in the Controls panel to create runs.")
             conn.close()
         else:
-            st.subheader("ðŸ“‹ All Saved Runs")
+            st.subheader("📋 All Saved Runs")
             st.dataframe(runs_df, use_container_width=True, hide_index=True)
 
             run_ids = runs_df["run_id"].tolist()
@@ -447,7 +432,7 @@ with tab2:
                 index=min(1, len(run_ids) - 1), key="run_b"
             )
 
-            if st.button("ðŸ” Compare Selected Runs"):
+            if st.button("🔍 Compare Selected Runs"):
                 if run_a == run_b:
                     st.warning("Select two different runs to compare.")
                 else:
@@ -464,18 +449,18 @@ with tab2:
                         snap_b, on="ticker",
                         suffixes=(f" (Run {run_a})", f" (Run {run_b})")
                     )
-                    merged["Rank Î”"]  = (
+                    merged["Rank Δ"]  = (
                         merged[f"rank (Run {run_a})"] - merged[f"rank (Run {run_b})"]
                     ).astype(int)
-                    merged["Score Î”"] = (
+                    merged["Score Δ"] = (
                         merged[f"score (Run {run_a})"] - merged[f"score (Run {run_b})"]
                     ).round(4)
-                    merged = merged.sort_values("Rank Î”")
+                    merged = merged.sort_values("Rank Δ")
 
-                    st.subheader("ðŸ“Š Rank & Score Movement")
+                    st.subheader("📊 Rank & Score Movement")
                     st.dataframe(merged, use_container_width=True, hide_index=True)
 
-                    st.subheader("ðŸ“ˆ Score Comparison Chart")
+                    st.subheader("📈 Score Comparison Chart")
                     tickers_common = snap_a["ticker"].tolist()
                     scores_a = snap_a.set_index("ticker")["score"]
                     scores_b = snap_b.set_index("ticker")["score"]
@@ -501,22 +486,22 @@ with tab2:
 
             conn.close()
 
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-# TAB 3 â€” Backtest (Admin)
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ──────────────────────────────────────────────────────────────────────────────
+# TAB 3 — Backtest (Admin)
+# ──────────────────────────────────────────────────────────────────────────────
 with tab3:
     if user_role != "admin":
-        st.info("ðŸ”’ Admin only.")
+        st.info("🔒 Admin only.")
     else:
-        st.header("ðŸ“ˆ Walk-Forward Backtest")
+        st.header("📈 Walk-Forward Backtest")
         st.caption(
-            "Sharpe-optimised portfolio weights Â· Monthly rebalancing Â· "
-            "252-day rolling lookback Â· Equal-weight benchmark comparison Â· "
+            "Sharpe-optimised portfolio weights · Monthly rebalancing · "
+            "252-day rolling lookback · Equal-weight benchmark comparison · "
             "5 bps transaction costs applied"
         )
 
-        # â”€â”€ Backtest controls â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        with st.expander("âš™ï¸ Backtest Settings", expanded=True):
+        # ── Backtest controls ─────────────────────────────────────────────
+        with st.expander("⚙️ Backtest Settings", expanded=True):
             bt_tickers_text = st.text_input(
                 "Tickers for backtest (comma-separated)",
                 value=tickers_text,
@@ -537,7 +522,7 @@ with tab3:
                 "Lookback window (days)", 60, 504, 252, 21, key="bt_lookback"
             )
 
-        run_bt = st.button("â–¶ Run Backtest", type="primary")
+        run_bt = st.button("▶ Run Backtest", type="primary")
 
         if run_bt:
             if len(bt_tickers) < 2:
@@ -545,7 +530,7 @@ with tab3:
             else:
                 with st.spinner(
                     f"Running walk-forward backtest on {len(bt_tickers)} tickers "
-                    f"over {bt_period}â€¦ this may take 30â€“60 seconds."
+                    f"over {bt_period}… this may take 30–60 seconds."
                 ):
                     result = backtest_walkforward(
                         tickers=bt_tickers,
@@ -555,11 +540,11 @@ with tab3:
                     )
                 st.session_state.bt_result = result
 
-        # â”€â”€ Display results â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        # ── Display results ───────────────────────────────────────────────
         result = st.session_state.bt_result
 
         if result is None:
-            st.info("Configure settings above and click â–¶ Run Backtest.")
+            st.info("Configure settings above and click ▶ Run Backtest.")
 
         elif "error" in result:
             st.error(f"Backtest error: {result['error']}")
@@ -568,42 +553,42 @@ with tab3:
             opt = result["opt_summary"]
             eqw = result["eqw_summary"]
 
-            # â”€â”€ Key metrics â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-            st.subheader("ðŸ“Š Performance Summary")
+            # ── Key metrics ───────────────────────────────────────────────
+            st.subheader("📊 Performance Summary")
             c1, c2, c3, c4 = st.columns(4)
             c1.metric(
-                "Sharpe Ratio â€” HPIE",
+                "Sharpe Ratio — HPIE",
                 f"{opt['sharpe']:.3f}",
                 delta=f"{opt['sharpe'] - eqw['sharpe']:+.3f} vs benchmark"
             )
             c2.metric(
-                "Annualised Return â€” HPIE",
+                "Annualised Return — HPIE",
                 f"{opt['ann_return']*100:.2f}%",
                 delta=f"{(opt['ann_return'] - eqw['ann_return'])*100:+.2f}%"
             )
             c3.metric(
-                "Max Drawdown â€” HPIE",
+                "Max Drawdown — HPIE",
                 f"{opt['max_drawdown']*100:.2f}%",
                 delta=f"{(opt['max_drawdown'] - eqw['max_drawdown'])*100:+.2f}%",
                 delta_color="inverse"
             )
             c4.metric(
-                "Annualised Vol â€” HPIE",
+                "Annualised Vol — HPIE",
                 f"{opt['ann_vol']*100:.2f}%",
                 delta=f"{(opt['ann_vol'] - eqw['ann_vol'])*100:+.2f}%",
                 delta_color="inverse"
             )
 
-            # â”€â”€ Equity curve â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-            st.subheader("ðŸ“ˆ Equity Curve â€” HPIE vs Equal-Weight Benchmark")
+            # ── Equity curve ──────────────────────────────────────────────
+            st.subheader("📈 Equity Curve — HPIE vs Equal-Weight Benchmark")
             equity_df = pd.DataFrame({
                 "HPIE (Sharpe-Optimised)": result["equity_opt"].values,
                 "Equal-Weight Benchmark":  result["equity_eqw"].values,
             }, index=result["equity_opt"].index)
             st.line_chart(equity_df, use_container_width=True)
 
-            # â”€â”€ Side-by-side table â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-            st.subheader("ðŸ“‹ Full Comparison Table")
+            # ── Side-by-side table ────────────────────────────────────────
+            st.subheader("📋 Full Comparison Table")
             comp = pd.DataFrame({
                 "Metric": [
                     "Sharpe Ratio",
@@ -623,7 +608,7 @@ with tab3:
                     f"{eqw['ann_vol']*100:.2f}",
                     f"{eqw['max_drawdown']*100:.2f}",
                 ],
-                "Difference (HPIE âˆ’ Benchmark)": [
+                "Difference (HPIE − Benchmark)": [
                     f"{opt['sharpe'] - eqw['sharpe']:+.3f}",
                     f"{(opt['ann_return'] - eqw['ann_return'])*100:+.2f}",
                     f"{(opt['ann_vol'] - eqw['ann_vol'])*100:+.2f}",
@@ -632,8 +617,8 @@ with tab3:
             })
             st.dataframe(comp, use_container_width=True, hide_index=True)
 
-            # â”€â”€ Run details â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-            with st.expander("ðŸ” Backtest Details"):
+            # ── Run details ───────────────────────────────────────────────
+            with st.expander("🔍 Backtest Details"):
                 st.write(f"**Tickers ({len(result['tickers'])}):** "
                          f"{', '.join(result['tickers'])}")
                 st.write(f"**Period:** {result['period']}  |  "
@@ -647,13 +632,13 @@ with tab3:
                     "allocation rebalanced monthly."
                 )
 
-            # â”€â”€ Export backtest results â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-            st.subheader("â¬‡ï¸ Export Backtest Results")
+            # ── Export backtest results ───────────────────────────────────
+            st.subheader("⬇️ Export Backtest Results")
             bt_export = pd.DataFrame({
                 "Metric":    comp["Metric"],
                 "HPIE":      comp["HPIE (Sharpe-Optimised)"],
                 "Benchmark": comp["Equal-Weight Benchmark"],
-                "Delta":     comp["Difference (HPIE âˆ’ Benchmark)"],
+                "Delta":     comp["Difference (HPIE − Benchmark)"],
             })
             st.download_button(
                 label="Download Results CSV",
@@ -661,4 +646,3 @@ with tab3:
                 file_name=f"backtest_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
                 mime="text/csv",
             )
-
