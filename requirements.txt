@@ -9,3 +9,6 @@ matplotlib
 bcrypt
 openai>=1.30.0
 groq
+plotly
+
+plotly
