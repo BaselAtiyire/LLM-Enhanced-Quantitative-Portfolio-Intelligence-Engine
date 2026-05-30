@@ -231,21 +231,6 @@ with tab1:
         "Risk-free rate (annual, decimal)", 0.0, 0.20, 0.00, 0.01
     )
 
-
-    # DATE PICKER
-    import datetime as _dt
-    st.sidebar.subheader("📅 Data as of date")
-    selected_date = st.sidebar.date_input(
-        label="Fetch market data as of",
-        value=_dt.date(2026, 5, 8),
-        min_value=_dt.date(2020, 1, 1),
-        max_value=_dt.date.today(),
-        help="Set to 2026-05-08 to reproduce paper results exactly.",
-    )
-    selected_date_str = selected_date.strftime("%Y-%m-%d")
-    st.sidebar.caption(
-        f"Set to 2026-05-08 to reproduce paper results."
-    )
     st.sidebar.subheader("Ranking weights")
     w_mcap = st.sidebar.number_input("Market Cap",               value=0.30, step=0.05)
     w_mom  = st.sidebar.number_input("1W %",                     value=0.25, step=0.05)
@@ -268,7 +253,7 @@ with tab1:
             st.sidebar.error("Enter at least 2 tickers.")
         else:
             with st.spinner("Fetching data + computing metrics..."):
-                raw_rows    = [get_stock_snapshot(t, period=period, rf_annual=rf, end_date=selected_date_str) for t in tickers]
+                raw_rows    = [get_stock_snapshot(t, period=period, rf_annual=rf) for t in tickers]
                 scored_rows = add_scores_and_ranks(raw_rows, weights=weights)
 
             as_of  = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -349,7 +334,7 @@ with tab1:
                 fig.update_layout(
                     xaxis_title="Ticker", yaxis_title="Score",
                     height=380, margin=dict(t=30, b=40),
-                    yaxis=dict(range=[0.2, raw["score"].max() * 1.15], autorange=False)
+                    yaxis=dict(range=[0, raw["score"].max() * 1.18])
                 )
                 st.plotly_chart(fig, use_container_width=True)
             except Exception:
