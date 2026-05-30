@@ -1,4 +1,4 @@
-import os
+﻿import os
 import json
 from datetime import datetime
 
@@ -227,6 +227,12 @@ with tab1:
     period = st.sidebar.selectbox(
         "History period", ["3mo","6mo","1y","2y","5y"], index=2
     )
+    from datetime import date as _date
+    if st.sidebar.checkbox("Fix end date", value=False):
+        end_date_str = st.sidebar.date_input("End date", value=_date(2026,5,20)).strftime("%Y-%m-%d")
+        st.sidebar.success(f"Fixed: {end_date_str}")
+    else:
+        end_date_str = None
     rf = st.sidebar.number_input(
         "Risk-free rate (annual, decimal)", 0.0, 0.20, 0.00, 0.01
     )
@@ -646,3 +652,4 @@ with tab3:
                 file_name=f"backtest_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
                 mime="text/csv",
             )
+
