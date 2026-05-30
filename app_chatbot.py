@@ -1,6 +1,6 @@
-﻿import os
+import os
 import json
-from datetime import datetime
+from datetime import datetime, date as _date
 
 import streamlit as st
 import yaml
@@ -227,12 +227,34 @@ with tab1:
     period = st.sidebar.selectbox(
         "History period", ["3mo","6mo","1y","2y","5y"], index=2
     )
-    from datetime import date as _date
-    if st.sidebar.checkbox("Fix end date", value=False):
-        end_date_str = st.sidebar.date_input("End date", value=_date(2026,5,20)).strftime("%Y-%m-%d")
-        st.sidebar.success(f"Fixed: {end_date_str}")
+
+    # ── Research date selector ──────────────────────────────────────────────
+    st.sidebar.markdown("---")
+    use_custom_date = st.sidebar.checkbox(
+        "📅 Fix end date (reproducible research sessions)",
+        value=False,
+        help="Pin the data end date to generate reproducible results for any past date"
+    )
+    if use_custom_date:
+        end_date_input = st.sidebar.date_input(
+            "Data end date",
+            value=_date(2026, 5, 20),
+            min_value=_date(2020, 1, 1),
+            max_value=_date.today(),
+            help="All factor data will be computed using this date as the cutoff"
+        )
+        end_date_str = end_date_input.strftime("%Y-%m-%d")
+        st.sidebar.success(f"📌 Fixed end date: {end_date_str}")
+        st.sidebar.caption(
+            "Results are reproducible — any user setting the same date "
+            "will retrieve identical yfinance end-of-day data."
+        )
     else:
         end_date_str = None
+        st.sidebar.caption("Using latest available market data.")
+    st.sidebar.markdown("---")
+    # ────────────────────────────────────────────────────────────────────────
+
     rf = st.sidebar.number_input(
         "Risk-free rate (annual, decimal)", 0.0, 0.20, 0.00, 0.01
     )
@@ -258,8 +280,17 @@ with tab1:
         if len(tickers) < 2:
             st.sidebar.error("Enter at least 2 tickers.")
         else:
-            with st.spinner("Fetching data + computing metrics..."):
-                raw_rows    = [get_stock_snapshot(t, period=period, rf_annual=rf) for t in tickers]
+            date_label = end_date_str if end_date_str else "latest"
+            with st.spinner(f"Fetching data (end date: {date_label}) + computing metrics..."):
+                raw_rows = [
+                    get_stock_snapshot(
+                        t,
+                        period=period,
+                        rf_annual=rf,
+                        end_date=end_date_str      # ← passes fixed date or None
+                    )
+                    for t in tickers
+                ]
                 scored_rows = add_scores_and_ranks(raw_rows, weights=weights)
 
             as_of  = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -278,17 +309,20 @@ with tab1:
             # ───────────────────────────────────────────────────────────────
 
             st.session_state.dataset = {
-                "run_id":  run_id,
-                "as_of":   as_of,
-                "source":  source,
-                "weights": weights,
-                "tickers": tickers,
-                "table":   scored_rows,
-                "period":  period,
-                "rf":      rf,
+                "run_id":   run_id,
+                "as_of":    as_of,
+                "source":   source,
+                "weights":  weights,
+                "tickers":  tickers,
+                "table":    scored_rows,
+                "period":   period,
+                "rf":       rf,
+                "end_date": end_date_str or "latest",   # ← stored for reproducibility
             }
             st.session_state.chat_by_dataset = {}
-            st.sidebar.success(f"Analysis ready ✅  (run_id={run_id})")
+            st.sidebar.success(
+                f"Analysis ready ✅  (run_id={run_id}, end_date={end_date_str or 'latest'})"
+            )
 
     ds   = st.session_state.dataset
     dkey = dataset_key(ds)
@@ -299,9 +333,14 @@ with tab1:
     if not ds:
         st.info("Click ▶ Run to generate a dataset.")
     else:
-        st.write(f"**As of:** {ds['as_of']}  |  **Run ID:** {ds.get('run_id','—')}")
+        end_date_display = ds.get("end_date", "latest")
+        st.write(
+            f"**As of:** {ds['as_of']}  |  "
+            f"**Run ID:** {ds.get('run_id','—')}  |  "
+            f"**Data end date:** {end_date_display}"
+        )
         st.write(f"**Tickers:** {', '.join(ds['tickers'])}")
-        st.write(f"**Weights:** {ds['weights']}")
+        st.write(f"**Period:** {ds.get('period','—')}  |  **Weights:** {ds['weights']}")
 
         # Full-width scrollable dataframe
         df = ds_to_dataframe(ds, display=True)
@@ -325,7 +364,6 @@ with tab1:
             st.markdown("### 📊 Score chart")
             try:
                 import plotly.graph_objects as go
-                # Use raw table data (numeric) not the formatted display df
                 raw = pd.DataFrame(ds["table"]).copy()
                 raw["score"] = pd.to_numeric(raw["score"], errors="coerce")
                 raw["rank"]  = pd.to_numeric(raw["rank"],  errors="coerce")
@@ -373,7 +411,7 @@ Rules:
 - If a metric is missing from the dataset, say so.
 - Format numbers cleanly (e.g. 13.78% not 0.1378, $287.44 not 287.44).
 
-Dataset:
+Dataset (end date: {ds.get('end_date', 'latest')}):
 {json.dumps(ds["table"], indent=2, default=str)}
 
 Question: {q}
@@ -386,7 +424,7 @@ Question: {q}
                 else:
                     text = str(resp)
                 text = re.sub(r"```[a-z]*\n.*?```", "", text, flags=re.DOTALL).strip()
-                text = re.sub(r"`([^`]+)`", r"\1", text)  # strip inline backticks
+                text = re.sub(r"`([^`]+)`", r"\1", text)
                 lines = text.split("\n")
                 seen = set()
                 clean = []
@@ -506,7 +544,6 @@ with tab3:
             "5 bps transaction costs applied"
         )
 
-        # ── Backtest controls ─────────────────────────────────────────────
         with st.expander("⚙️ Backtest Settings", expanded=True):
             bt_tickers_text = st.text_input(
                 "Tickers for backtest (comma-separated)",
@@ -546,7 +583,6 @@ with tab3:
                     )
                 st.session_state.bt_result = result
 
-        # ── Display results ───────────────────────────────────────────────
         result = st.session_state.bt_result
 
         if result is None:
@@ -559,7 +595,6 @@ with tab3:
             opt = result["opt_summary"]
             eqw = result["eqw_summary"]
 
-            # ── Key metrics ───────────────────────────────────────────────
             st.subheader("📊 Performance Summary")
             c1, c2, c3, c4 = st.columns(4)
             c1.metric(
@@ -585,7 +620,6 @@ with tab3:
                 delta_color="inverse"
             )
 
-            # ── Equity curve ──────────────────────────────────────────────
             st.subheader("📈 Equity Curve — HPIE vs Equal-Weight Benchmark")
             equity_df = pd.DataFrame({
                 "HPIE (Sharpe-Optimised)": result["equity_opt"].values,
@@ -593,7 +627,6 @@ with tab3:
             }, index=result["equity_opt"].index)
             st.line_chart(equity_df, use_container_width=True)
 
-            # ── Side-by-side table ────────────────────────────────────────
             st.subheader("📋 Full Comparison Table")
             comp = pd.DataFrame({
                 "Metric": [
@@ -623,7 +656,6 @@ with tab3:
             })
             st.dataframe(comp, use_container_width=True, hide_index=True)
 
-            # ── Run details ───────────────────────────────────────────────
             with st.expander("🔍 Backtest Details"):
                 st.write(f"**Tickers ({len(result['tickers'])}):** "
                          f"{', '.join(result['tickers'])}")
@@ -638,7 +670,6 @@ with tab3:
                     "allocation rebalanced monthly."
                 )
 
-            # ── Export backtest results ───────────────────────────────────
             st.subheader("⬇️ Export Backtest Results")
             bt_export = pd.DataFrame({
                 "Metric":    comp["Metric"],
@@ -652,4 +683,3 @@ with tab3:
                 file_name=f"backtest_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
                 mime="text/csv",
             )
-
